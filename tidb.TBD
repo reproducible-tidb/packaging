@@ -1,0 +1,16 @@
+pkgname=tidb
+pkgver=v5.3.0
+pkgrel=1
+pkgdesc='TiDB is an open source distributed HTAP database compatible with the MySQL protocol.'
+pkggit="https://github.com/nexustar/tidb.git"
+pkgcommit="455ec27e17bed787391f74a42e255456861e8960"
+image="docker.io/golang:1.16.12-bullseye"
+
+build() {
+  make
+}
+
+package() {
+  cp bin/tidb-server /pkg/
+}
+
