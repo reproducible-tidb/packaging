@@ -1,0 +1,19 @@
+pkgname=tidb-operator
+pkgver=v1.2.6
+pkgrel=1
+pkgdesc='TiDB operator creates and manages TiDB clusters running in Kubernetes.'
+pkggit="https://github.com/AstroProfundis/tidb-operator.git"
+pkgref="reprobuild"
+image="docker.io/golang:1.16.12-bullseye"
+
+build() {
+  export GOPATH=/src/$pkgname/gopath
+  #export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+  mkdir -p $GOPATH
+  make build
+}
+
+package() {
+  install -Dm755 images/tidb-operator/bin/* $pkgdir/
+}
+
