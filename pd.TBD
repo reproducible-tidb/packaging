@@ -1,0 +1,23 @@
+pkgname=pd
+pkgver=v5.3.0
+pkgrel=1
+pkgdesc='Placement driver for TiKV.'
+pkggit="https://github.com/AstroProfundis/pd.git"
+pkgref="reprobuild"
+image="docker.io/golang:1.16.12-bullseye"
+
+build() {
+  export GOPATH=/src/$pkgname/gopath
+  #export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+  mkdir -p $GOPATH
+
+  apt update
+  apt install -qy unzip
+
+  make build tools
+}
+
+package() {
+  install -Dm755 bin/* $pkgdir/
+}
+
