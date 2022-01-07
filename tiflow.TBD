@@ -1,0 +1,19 @@
+pkgname=tiflow
+pkgver=v5.3.0
+pkgrel=1
+pkgdesc='DM and TiCDC.'
+pkggit="https://github.com/AstroProfundis/tiflow.git"
+pkgref="master"
+image="docker.io/golang:1.16.12-bullseye"
+
+build() {
+  export GOPATH=/src/$pkgname/gopath
+  #export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+  mkdir -p $GOPATH
+  make
+}
+
+package() {
+  install -Dm755 bin/* $pkgdir/
+}
+
