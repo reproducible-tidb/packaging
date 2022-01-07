@@ -6,14 +6,15 @@ pkggit="https://github.com/AstroProfundis/pd.git"
 pkgref="reprobuild"
 image="docker.io/golang:1.16.12-bullseye"
 
+prepare() {
+  apt update
+  apt install -qy unzip
+}
+
 build() {
   export GOPATH=/src/$pkgname/gopath
   #export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
   mkdir -p $GOPATH
-
-  apt update
-  apt install -qy unzip
-
   make build tools
 }
 
