@@ -1,0 +1,19 @@
+version: 2.1
+
+workflows:
+  build:
+    jobs:
+      - build:
+          context: GITHUB
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout
+      - run: ./.circleci/install_TBD.sh
+      - run: find ./*.TBD -type f -exec ../TBD/TBD.sh {} \;
+      - run: rm -rf results && mkdir results && mv ./*.json results
+      - run: ./.circleci/deploy.sh $GITHUB_TOKEN
+
