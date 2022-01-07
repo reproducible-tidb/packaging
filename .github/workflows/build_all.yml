@@ -1,0 +1,26 @@
+name: build-reproducible
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install TBD
+      run: git clone https://github.com/reproducible-tidb/TBD.git ../TBD
+    - name: Run jobs
+      run: find ./*.TBD -type f -exec ../TBD/TBD.sh {} \;
+      env:
+        CI_NAME: githubaction
+    - name: Move result json files
+      run: |
+        mkdir results && mv ./*.json results/
+    - name: Publish results
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: results-githubaction
+        folder: results
