@@ -1,0 +1,20 @@
+pkgname=tiup
+pkgver=v1.8.1
+pkgrel=1
+pkgdesc='TiUP is component manager for TiDB.'
+pkggit="https://github.com/pingcap/tiup.git"
+pkgref="master"
+image="docker.io/golang:1.16.12-bullseye"
+
+build() {
+  export GOPATH=/src/$pkgname/gopath
+  #export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+  mkdir -p $GOPATH
+  BUILD_FLAGS='-trimpath' make build
+  BUILD_FLAGS='-trimpath' make ctl
+}
+
+package() {
+  install -Dm755 bin/* $pkgdir/
+}
+
