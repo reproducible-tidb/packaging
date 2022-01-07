@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/install_TBD.sh
-      - run: find ./*.TBD -type f -exec ../TBD/TBD.sh {}
+      - run: find ./*.TBD -type f -exec ../TBD/TBD.sh {} \;
       - run: rm -rf results && mkdir results && mv ./*.json results
       - run: ./.circleci/deploy.sh $GITHUB_TOKEN
 
