@@ -5,8 +5,8 @@ trigger:
   branch:
   - master
   - drone
-node:
-  location: office
+#node:
+#  location: office
 
 steps:
   - name: Install TBD & build packages
@@ -14,24 +14,24 @@ steps:
     privileged: true
     environment:
       TBD_CRI: podman
-      GITHUB_SSH_KEY:
-        from_secret: GITHUB_SSH_KEY
     commands:
+    #- sed -e 's|^metalink=|#metalink=|g' -e 's|^#baseurl=http:\/\/download.example\/pub\/fedora\/linux|baseurl=https:\/\/mirrors.ustc.edu.cn\/fedora|g' -i /etc/yum.repos.d/fedora*.repo
     - dnf install -y git findutils
     - git clone https://github.com/reproducible-tidb/TBD.git ../TBD
-    - git config --global user.email 'runner@drone.zhoal.pw'
-    - git config --global user.name 'Drone CI'
-    - git remote add release git@github.com:reproducible-tidb/packaging.git
-    - mkdir -p ~/.ssh && chmod 600 ~/.ssh
-    - echo $GITHUB_SSH_KEY > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
     - find ./*.TBD -type f -exec ../TBD/TBD.sh {} \;
-#  - name: Upload results
-#    image: quay.io/podman/stable
-#    privileged: true
-#    commands:
-#    - rm -rf results && mkdir results && mv ./*.json results
-#    - git checkout -b results-drone
-#    - git add results
-#    - git commit -m 'Drone CI: Update build results'
-#    - git push -f release
+    - rm -rf results && mkdir results && mv ./*.json results
+  - name: Upload results
+    image: appleboy/drone-git-push
+    environment:
+      PLUGIN_SSH_KEY:
+        from_secret: GITHUB_SSH_KEY
+    settings:
+      remote: git@github.com:reproducible-tidb/packaging.git
+      remote_name: release
+      branch: results-drone
+      commit: true
+      commit_message: Drone CI build
+      author_name: Drone CI
+      author_email: runner@drone.zhoal.pw
+      force: true
 
