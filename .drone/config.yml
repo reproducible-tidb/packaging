@@ -1,0 +1,47 @@
+kind: pipeline
+type: docker
+name: reprobuild
+trigger:
+  branch:
+  - master
+  - drone
+node:
+  location: office
+
+volumes:
+- name: cache
+  path: /var/cache/drone/tbd
+- name: containers
+  path: /var/cache/drone/containers
+
+steps:
+- name: Install TBD & build packages
+  image: quay.io/podman/stable
+  privileged: true
+  volumes:
+  - name: cache
+    path: /src/cache
+  - name: containers
+    path: /var/lib/containers
+  environment:
+    TBD_CRI: podman
+    TBD_CACHE: /src/cache
+  commands:
+  - .drone/prepare.sh
+  - sed -e 's|^metalink=|#metalink=|g' -e 's|^#baseurl=http:\/\/download.example\/pub\/fedora\/linux|baseurl=https:\/\/mirrors.ustc.edu.cn\/fedora|g' -i /etc/yum.repos.d/fedora*.repo
+  - dnf install -y git findutils
+  - git clone https://github.com/reproducible-tidb/TBD.git ../TBD
+  - find ./*.TBD -type f -exec ../TBD/TBD.sh {} \;
+  - rm -rf results && mkdir results && mv ./*.json results
+- name: Upload results
+  image: bitnami/git:2
+  environment:
+    GIT_PUSH_SSH_KEY:
+      from_secret: github_ssh_key
+    GIT_REMOTE: git@github.com:reproducible-tidb/packaging.git
+  commands:
+  - mkdir -p /root/.ssh && chmod 600 /root/.ssh
+  - echo "$GIT_PUSH_SSH_KEY" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
+  - ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+  - .drone/deploy.sh
+
