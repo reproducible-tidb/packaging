@@ -5,6 +5,9 @@ workflows:
     jobs:
       - build:
           context: GITHUB
+          filters:
+            branches:
+              only: master
 
 jobs:
   build:
